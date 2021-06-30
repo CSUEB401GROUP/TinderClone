@@ -1,2 +1,2 @@
 # TinderClone
-# We are creating a clone of the Tinder applications with similair functionalities
+# We are creating a clone of the Tinder application with similar functionalities
