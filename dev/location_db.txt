@@ -1,0 +1,133 @@
+location_id,location_origin,location_destination,location_distance
+1,san jose,san francisco,48
+2,san jose,los angeles,340
+3,san jose,seattle,837
+4,san jose,las vegas,530
+5,san jose,phoenix,710
+6,san jose,sacramento,116
+7,san jose,portland,912
+8,san jose,denver,927
+9,san jose,albuquerque,862
+10,san jose,reno,188
+11,san jose,boise,526
+12,san francisco,los angeles,347
+13,san francisco,seattle,678
+14,san francisco,las vegas,416
+15,san francisco,phoenix,653
+16,san francisco,sacramento,74
+17,san francisco,portland,534
+18,san francisco,denver,947
+19,san francisco,albuquerque,895
+20,san francisco,reno,185
+21,san francisco,boise,518
+22,los angeles,seattle,959
+23,los angeles,las vegas,228
+24,los angeles,phoenix,356
+25,los angeles,sacramento,361
+26,los angeles,portland,826
+27,los angeles,denver,830
+28,los angeles,albuquerque,663
+29,los angeles,reno,388
+30,los angeles,boise,669
+31,seattle,las vegas,871
+32,seattle,phoenix,1114
+33,seattle,sacramento,625
+34,seattle,portland,145
+35,seattle,denver,1019
+36,seattle,albuquerque,1182
+37,seattle,reno,571
+38,seattle,boise,404
+39,las vegas,phoenix,256
+40,las vegas,sacramento,386
+41,las vegas,portland,755
+42,las vegas,denver,605
+43,las vegas,albuquerque,482
+44,las vegas,reno,344
+45,las vegas,boise,517
+46,phoenix,sacramento,634
+47,phoenix,portland,1005
+48,phoenix,denver,585
+49,phoenix,albuquerque,329
+50,phoenix,reno,600
+51,phoenix,boise,736
+52,sacramento,portland,483
+53,sacramento,denver,886
+54,sacramento,albuquerque,854
+55,sacramento,reno,111
+56,sacramento,boise,443
+57,portland,denver,981
+58,portland,albuquerque,1106
+59,portland,reno,438
+60,portland,boise,344
+61,denver,albuquerque,334
+62,denver,reno,788
+63,denver,boise,637
+64,albuquerque,reno,784
+65,albuquerque,boise,778
+66,reno,boise,338
+67,san francisco,san jose,48
+68,los angeles,san jose,340
+69,seattle,san jose,837
+70,las vegas,san jose,530
+71,phoenix,san jose,710
+72,sacramento,san jose,116
+73,portland,san jose,912
+74,denver,san jose,927
+75,albuquerque,san jose,862
+76,reno,san jose,188
+77,boise,san jose,526
+78,los angeles,san francisco,347
+79,seattle,san francisco,678
+80,las vegas,san francisco,416
+81,phoenix,san francisco,653
+82,sacramento,san francisco,74
+83,portland,san francisco,534
+84,denver,san francisco,947
+85,albuquerque,san francisco,895
+86,reno,san francisco,185
+87,boise,san francisco,518
+88,seattle,los angeles,959
+89,las vegas,los angeles,228
+90,phoenix,los angeles,356
+91,sacramento,los angeles,361
+92,portland,los angeles,826
+93,denver,los angeles,830
+94,albuquerque,los angeles,663
+95,reno,los angeles,388
+96,boise,los angeles,669
+97,las vegas,seattle,871
+98,phoenix,seattle,1114
+99,sacramento,seattle,625
+100,portland,seattle,145
+101,denver,seattle,1019
+102,albuquerque,seattle,1182
+103,reno,seattle,571
+104,boise,seattle,404
+105,phoenix,las vegas,256
+106,sacramento,las vegas,386
+107,portland,las vegas,755
+108,denver,las vegas,605
+109,albuquerque,las vegas,482
+110,reno,las vegas,344
+111,boise,las vegas,517
+112,sacramento,phoenix,634
+113,portland,phoenix,1005
+114,denver,phoenix,585
+115,albuquerque,phoenix,329
+116,reno,phoenix,600
+117,boise,phoenix,736
+118,portland,sacramento,483
+119,denver,sacramento,886
+120,albuquerque,sacramento,854
+121,reno,sacramento,111
+122,boise,sacramento,443
+123,denver,portland,981
+124,albuquerque,portland,1106
+125,reno,portland,438
+126,boise,portland,344
+127,albuquerque,denver,334
+128,reno,denver,788
+129,boise,denver,637
+130,reno,albuquerque,784
+131,boise,albuquerque,778
+132,boise,reno,338

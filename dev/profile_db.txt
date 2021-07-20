@@ -1,0 +1,12 @@
+profile_id,profile_uid,profile_fname,profile_lname,profile_age,profile_gender,profile_pref_distance
+1,1,patrick,bateman,27,male,1200
+2,2,ned,flanders,60,male,180
+3,3,marge,simpson,34,female,300
+4,4,sadako,yamamura,11,male,800
+5,5,claire,redfield,19,male,450
+6,6,hedgehog,,18,male,80
+7,7,bronco,,21,male,600
+8,8,fox,,24,male,220
+9,9,mole,,27,male,307
+10,10,willow,,30,male,97
+11,11,amon,,33,male,40
