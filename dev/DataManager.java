@@ -1,8 +1,12 @@
+package com.tinderclone.server.core;
 import java.io.*;
 import java.util.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Set;
+
+import com.tinderclone.common.entity.Profile;
+
 import java.sql.Timestamp;
 
 public class DataManager{
@@ -13,7 +17,7 @@ public class DataManager{
 	private DataStore matchDB;
 	private DataStore locationDB;
 
-	public DataManager(){
+	public DataManager() {
 		
 		//Instantiate each of the databases
 		this.userDB = new DataStore("user_db.txt");
@@ -25,7 +29,7 @@ public class DataManager{
 	}
 	
 	//Checks user credentials against userDB for a login action
-	public Boolean login(String user,String pass){
+	public Boolean login(String user,String pass) {
 
 		Boolean valid = false;
 		
@@ -42,7 +46,7 @@ public class DataManager{
 	}
 	
 	//Adds a profile to profileDB
-	public Boolean addProfile(String user){
+	public Boolean addProfile(String user) {
 		
 		Boolean valid;
 		
@@ -72,7 +76,7 @@ public class DataManager{
 	}
 	
 	//Adds a new match to matchDB
-	public Boolean addMatch(String user, String pid, String option){
+	public Boolean addMatch(String user, String pid, String option) {
 		
 		Boolean valid = false;
 		
@@ -94,7 +98,7 @@ public class DataManager{
 		params.clear();
 
 		//If this is a new match, continue 
-		if(!exist){
+		if (!exist) {
 			//Retrieve the next match_id by counting the entries already in matchDB
 			int mid = this.matchDB.getAllEntries().size() + 1;
 			
@@ -112,7 +116,7 @@ public class DataManager{
 	}	
 	
 	//Adds a user to userDB
-	public Boolean register(String user,String pass){
+	public Boolean register(String user,String pass) {
 		
 		Boolean valid = false;
 		
@@ -124,7 +128,7 @@ public class DataManager{
 		Boolean found = this.userDB.entryExists(params);
 		
 		//If an account with that user_name does not already exist, continue
-		if(!found){
+		if (!found) {
 			
 			//Retrieve the next user_id by counting the entries already in userDB
 			int uid = this.userDB.getAllEntries().size() + 1;
@@ -140,7 +144,7 @@ public class DataManager{
 			valid = this.userDB.addEntry(params,headers);
 			
 			//Set return value to result of the final profile add
-			if(valid){
+			if (valid) {
 				valid = this.addProfile(user);
 			}
 		}
@@ -148,7 +152,7 @@ public class DataManager{
 	}
 	
 	//Retrieves a profile from profileDB via user_name
-	public Profile getProfile(String name){
+	public Profile getProfile(String name) {
 		//Create a parameter hashmap with key -> value pairs
 		HashMap<String,String> params = new HashMap<String,String>();
 		
@@ -160,7 +164,7 @@ public class DataManager{
 		Profile prof = null;
 		
 		//If profile exists, store in return object
-		if(found){
+		if (found) {
 			DataEntry de = this.profileDB.getDataEntryList(params).currentEntry();
 			prof = new Profile(de.getByField("profile_fname"));
 		}
@@ -168,7 +172,7 @@ public class DataManager{
 	}
 	
 	//Edits profile data for a given user using a provided Profile object
-	public Boolean editProfile(String name,Profile prof){
+	public Boolean editProfile(String name, Profile prof) {
 		//Create a parameter hashmap with key -> value pairs
 		HashMap<String,String> params = new HashMap<String,String>();
 		
@@ -182,7 +186,7 @@ public class DataManager{
 	}
 	
 	//Returns a list of profile objects of online users with no distance restrictions
-	public ArrayList<Profile> getMatches(String name){
+	public ArrayList<Profile> getMatches(String name) {
 		
 		ArrayList<Profile> profiles = new ArrayList<Profile>();
 		DataEntryList results = null;
@@ -199,10 +203,10 @@ public class DataManager{
 		params.put("match_rater",uid);
 		results = this.matchDB.getDataEntryList(params);
 		params.clear();
-		if(results!=null){
+		if (results!=null) {
 			DataEntry de = results.currentEntry();
 			matched = new ArrayList<String>();
-			while(de != null){
+			while (de != null) {
 				matched.add(de.getByField("match_ratee"));
 				de = results.getNextEntry();
 			}
@@ -213,11 +217,11 @@ public class DataManager{
 		results = this.profileDB.getDataEntryList(params);
 		params.clear();
 		
-		if(results!=null){
+		if (results!=null) {
 			DataEntry de = results.currentEntry();
 			profiles = new ArrayList<Profile>();
-			while(de != null){
-				if(!matched.contains(de.getByField("profile_uid"))){
+			while (de != null) {
+				if (!matched.contains(de.getByField("profile_uid"))) {
 					profiles.add(new Profile(de.getByField("profile_fname") + " " + de.getByField("profile_lname")));
 				}
 				de = results.getNextEntry();
@@ -228,7 +232,7 @@ public class DataManager{
 	
 	//Returns a list of Profile objects of online users within the local range of the specified user
 	//The input HashMap is a list of users online at the moment
-	public ArrayList<Profile> getNearbyMatches(String user, HashMap<String,String> users){
+	public ArrayList<Profile> getNearbyMatches(String user, HashMap<String,String> users) {
 		
 		ArrayList<Profile> profiles = new ArrayList<Profile>();
 		DataEntryList results = null; 
@@ -246,28 +250,28 @@ public class DataManager{
 		params.put("match_rater",uid);
 		results = this.matchDB.getDataEntryList(params);
 		params.clear();
-		if(results!=null){
+		if (results!=null) {
 			DataEntry de = results.currentEntry();
 			matched = new ArrayList<String>();
-			while(de != null){
+			while (de != null) {
 				matched.add(de.getByField("match_ratee"));
 				de = results.getNextEntry();
 			}
 		}	
 		
-		for(String name : users.keySet()){
+		for(String name : users.keySet()) {
 			params.clear();
 			params.put("user_name",name);
 			results = this.userDB.getDataEntryList(params);
 			uid = this.getUserID(name);
 			params.clear();
-			if(results!=null){
+			if (results!=null) {
 				params.clear();
 				params.put("profile_uid",uid);
-				if(!matched.contains(uid)){
+				if (!matched.contains(uid)) {
 					Boolean found = this.profileDB.entryExists(params);
 					DataEntry de = this.profileDB.getDataEntryList(params).currentEntry();
-					if(found!=null){
+					if (found != null) {
 						profiles.add(new Profile(de.getByField("profile_fname") + " " + de.getByField("profile_lname")));
 					}
 				}
@@ -278,11 +282,11 @@ public class DataManager{
 	}
 	
 	//Retrieves user_id from userDB for a given user_name
-	private String getUserID(String name){
+	private String getUserID(String name) {
 		//Create a parameter hashmap with key -> value pairs
-		HashMap<String,String> params = new HashMap<String,String>();
+		HashMap<String, String> params = new HashMap<String, String>();
 		
-		params.put("user_name",name);
+		params.put("user_name", name);
 		String uid = this.userDB.getDataEntryList(params).currentEntry().getByField("user_id");
 		params.clear();
 		
@@ -290,22 +294,22 @@ public class DataManager{
 	}
 	
 	//Returns maximum specified search range for a given user
-	public int getRange(String name){
+	public int getRange(String name) {
 		//Create a parameter hashmap with key -> value pairs
-		HashMap<String,String> params = new HashMap<String,String>();
+		HashMap<String, String> params = new HashMap<String, String>();
 		
 		String uid = this.getUserID(name);
 		
-		params.put("profile_uid",uid);
+		params.put("profile_uid", uid);
 		DataEntryList results = this.profileDB.getDataEntryList(params);
-		if(results!=null){
+		if (results != null) {
 			return Integer.parseInt(results.currentEntry().getByField("profile_pref_distance"));
 		}
 		return -1;
 	}
 	
 	//Returns a random location string from the locationDB
-	public String getRandomLocation(){
+	public String getRandomLocation() {
 		DataEntryList locations = this.locationDB.getAllEntries();
 		int index = new Random().nextInt(locations.size());
 		String location = locations.getEntryAt(index).getByField("location_origin");
@@ -313,22 +317,22 @@ public class DataManager{
 	}
 	
 	//Returns the distance between two given cities
-	public int getDistance(String origin, String destination){
+	public int getDistance(String origin, String destination) {
 		origin = origin.toLowerCase();
 		destination = destination.toLowerCase();
-		if(origin.compareTo(destination)==0){
+		if (origin.compareTo(destination)==0) {
 			return 0;
 		}
 		
 		//Create a parameter hashmap with key -> value pairs
 		HashMap<String,String> params = new HashMap<String,String>();
-		params.put("location_origin",origin);
-		params.put("location_destination",destination);
+		params.put("location_origin", origin);
+		params.put("location_destination", destination);
 		DataEntryList del = this.locationDB.getDataEntryList(params);
-		if(del!=null){
+		if (del!=null) {
 			int d = Integer.parseInt(del.currentEntry().getByField("location_distance"));
 			return d;
-		}else{
+		} else {
 			return -1;
 		}
 	}

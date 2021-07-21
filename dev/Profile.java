@@ -1,21 +1,47 @@
-import java.io.*;
+package com.tinderclone.common.entity;
+
 import java.io.Serializable;
 
-public class Profile implements Serializable{
-	private String name;
-	public Profile(String n){
-		this.name = n;
+public class Profile implements Serializable {
+	
+	private static final long serialVersionUID = -3796265508510487052L;
+
+	public Profile(String name) {
+		super();
 	}
-	public String getID(){
-		return "6";
-	}	
-	public String getName(){
-		return this.name;
+
+	private Attribute attribute = new Attribute();
+	private Picture picture;
+	private Location location;
+	private String ID;
+	
+	public void displayAll() {
+		System.out.println(this.getAttribute().toString());
+		System.out.println(this.getPicture().toString());
 	}
-	public void setName(String n){
-		this.name = n;
+	
+	public Attribute getAttribute() {
+		return this.attribute;
 	}
-	public void print(){
-		System.out.println("Printing profile of... " + this.getName());
+	
+	public void editAttribute(String name) {
+		this.attribute = new Attribute();
+		this.attribute.setName(name);
+	}
+
+	public String getID() {
+		return ID;
+	}
+
+	public void setID(String iD) {
+		this.ID = iD;
+	}
+
+	public Picture getPicture() {
+		return picture;
+	}
+	
+	public Location getLocation() {
+		return this.location;
 	}
 }

@@ -1,19 +1,22 @@
-import java.io.*;
-import java.util.*;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Stack;
+package com.tinderclone.server.core;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.sql.Timestamp;
-import java.net.Socket;
-import java.net.ServerSocket;
-import java.util.Scanner;
-import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.Stack;
 
+import com.tinderclone.common.entity.Profile;
+import com.tinderclone.common.entity.DataValue;
 
 public class DataHost{
 	
@@ -22,7 +25,7 @@ public class DataHost{
 	private HashMap<String,String> locations;
 	private HashMap<String,Long> heartbeats;
 	
-	public DataHost(){
+	public DataHost() {
 		//Maximum number of clients allowed before logins are refused
 		this.max_clients = 10;
 		//Session keys stored by user_name
@@ -34,44 +37,44 @@ public class DataHost{
 		this.listen();
 	}
 	
-	public void setMaxClients(int max){
+	public void setMaxClients(int max) {
 		this.max_clients = max;
 	}
 	
 	//Main method to start server and wait for a request
-	private void listen(){
+	private void listen() {
 		try{
 			ServerSocket host = new ServerSocket(60000);
 			InetAddress localhost = InetAddress.getLocalHost(); 
 			System.out.println("IPV4 Address : " + (localhost.getHostAddress()).trim());
-			while(true){
+			while (true) {
 				Socket connection = host.accept();
 				PortManager pm = new PortManager(connection,this);
 				new Thread(pm).start();
 			}
-		}catch(IOException ioe){
+		}catch(IOException ioe) {
 			
 		}
 	}
 	
 	//Updates the last heartbeat timestamp for a given user
-	private void resetHeartbeat(String client){
+	private void resetHeartbeat(String client) {
 		this.heartbeats.put(client,System.currentTimeMillis());
 	}
 	
 	//Updates time elapsed since last heartbeat for each user
-	private void updateHeartbeats(){
-		for(String client : this.heartbeats.keySet()){
+	private void updateHeartbeats() {
+		for(String client : this.heartbeats.keySet()) {
 			long lastbeat = this.heartbeats.get(client);
 			long elapsed = (System.currentTimeMillis() - lastbeat)/1000;
-			if(elapsed > 30){
+			if (elapsed > 30) {
 				this.removeClient(client);
 			}
 		}
 	}
 	
 	//Returns an encrypted session key string based on the current timestamp string
-	private String generateKey(){
+	private String generateKey() {
 		try{
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			long now = System.currentTimeMillis();
@@ -81,23 +84,23 @@ public class DataHost{
 			String session_key = Base64.getEncoder().encodeToString(res);
 			
 			return session_key;
-		}catch(NoSuchAlgorithmException nsae){
+		}catch(NoSuchAlgorithmException nsae) {
 			
 		}
 		return null;
 	}
 	
 	//Returns random city string from possible locations
-	private String getRandomLocation(){
+	private String getRandomLocation() {
 		DataManager dm = new DataManager();
 		String location = dm.getRandomLocation();
 		return location;
 	}
 	
 	//Adds a client to the active clients list and returns the session key assigned
-	public String addClient(String id){
+	public String addClient(String id) {
 		String key = null;
-		if(this.keys.size()<this.max_clients){
+		if (this.keys.size()<this.max_clients) {
 			key = this.generateKey();
 			String location = this.getRandomLocation();
 			this.keys.put(id,key);
@@ -109,14 +112,14 @@ public class DataHost{
 	}
 	
 	//Checks to see if a user is connected
-	public Boolean hasClient(String name){
+	public Boolean hasClient(String name) {
 		Boolean found = false;
 		found = this.keys.containsKey(name);
 		return found;
 	}
 	
 	//Removes user from the active user list
-	public Boolean removeClient(String id){
+	public Boolean removeClient(String id) {
 		this.keys.remove(id);
 		this.locations.remove(id);
 		this.heartbeats.remove(id);
@@ -124,31 +127,31 @@ public class DataHost{
 	}
 	
 	//Checks that provided session key is valid for the given user
-	public Boolean validateClient(String id, String key){
+	public Boolean validateClient(String id, String key) {
 		String currkey = this.keys.get(id);
-		if(currkey!=null){
-			if(currkey.compareTo(key)==0){
+		if (currkey!=null) {
+			if (currkey.compareTo(key)==0) {
 				return true;
-			}else{
+			} else {
 				return false;
 			}
-		}else{
+		} else {
 			return false;
 		}
 	}
 	
 	//Returns active users near a given user's location based on their distance settings
-	public HashMap<String,String> getNearbyClients(String id){
+	public HashMap<String,String> getNearbyClients(String id) {
 		System.out.println("getNearbyClients :: " + id + " - total active: " + this.keys.size());
 		String origin = this.locations.get(id);
 		DataManager dm = new DataManager();
 		int range = dm.getRange(id);
 		HashMap<String,String> nearby = new HashMap<String,String>();
-		for(String client : this.keys.keySet()){
+		for(String client : this.keys.keySet()) {
 			String destination = this.locations.get(client);
 			int d = dm.getDistance(origin,destination);
-			if(d >= 0){
-				if(d < range && client.compareTo(id)!=0){
+			if (d >= 0) {
+				if (d < range && client.compareTo(id)!=0) {
 					nearby.put(client,Integer.toString(d));
 					System.out.println("Range is " + range);
 					System.out.println(this.locations.get(id) + " to " + this.locations.get(client) + " is " + d);
@@ -161,7 +164,7 @@ public class DataHost{
 	}
 	
 	//Prints select server info
-	public void serverStatus(){
+	public void serverStatus() {
 		System.out.println("# of active clients: " + this.keys.size());
 		this.locations.forEach((client,location) -> System.out.println("\t " + client + " :: " + location + " - seconds since last heartbeat: " + Long.toString((System.currentTimeMillis() - this.heartbeats.get(client))/1000)));
 	}
@@ -173,13 +176,13 @@ public class DataHost{
 		private Boolean login;
 		private DataHost dh;
 		
-		public PortManager(Socket connection,DataHost d){
+		public PortManager(Socket connection,DataHost d) {
 			this.connection = connection;
 			this.login = false;
 			this.dh = d;
 		}
 		
-		public void run(){
+		public void run() {
 			try{
 				
 				//Create object I/O stream connections
@@ -191,7 +194,7 @@ public class DataHost{
 				DataManager dm = new DataManager();
 				
 				//Infinite loop
-				while(true){
+				while (true) {
 					
 					//Initial state : waiting for a Stack<DataValue> object
 					System.out.println("Awaiting new request object...");
@@ -206,7 +209,7 @@ public class DataHost{
 					//***************************************************************
 					//Begin: series of if/else ifs for each possible request message type
 					
-					if(req_type.compareTo("register")==0){
+					if (req_type.compareTo("register")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_password		encrypted password string
@@ -229,16 +232,16 @@ public class DataHost{
 						
 						//Add the DataValue parameters to the response object
 						//The session key will either be an encrypted string or null
-						resp_msg.push(new DataValue("session_key",key));
-						resp_msg.push(new DataValue("response_value",response));
+						resp_msg.push(new DataValue("session_key", key));
+						resp_msg.push(new DataValue("response_value", response));
 						//The response_type will match the request type
-						resp_msg.push(new DataValue("response_type","register"));
+						resp_msg.push(new DataValue("response_type", "register"));
 						
 						//Send the object over the output stream
 						out.writeObject(resp_msg);
 						System.out.println("Register :: sending response obj...");
 						
-					}else if(req_type.compareTo("login")==0){
+					} else if (req_type.compareTo("login")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_password		encrypted password string
@@ -248,9 +251,9 @@ public class DataHost{
 						Boolean success = false;
 						
 						//Check that user is not already logged in
-						if(!this.dh.hasClient(name)){
+						if (!this.dh.hasClient(name)) {
 							success = dm.login(name,pass);
-						}else{
+						} else {
 							success = false;
 						}
 						
@@ -272,7 +275,7 @@ public class DataHost{
 						out.writeObject(resp_msg);
 						System.out.println("Login :: sending response obj...");
 						
-					}else if(req_type.compareTo("logout")==0){
+					} else if (req_type.compareTo("logout")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_name				user name
@@ -281,7 +284,7 @@ public class DataHost{
 						String key = recv_msg.pop().getValue();
 						Boolean valid = this.dh.validateClient(name,key);
 						Boolean success = false;
-						if(valid){
+						if (valid) {
 							//If client is logged in, remove them from the active client list
 							success = this.dh.removeClient(name);
 						}
@@ -297,7 +300,7 @@ public class DataHost{
 						out.writeObject(resp_msg);
 						System.out.println("Logout :: sending response obj...");
 						
-					}else if(req_type.compareTo("addmatch")==0){
+					} else if (req_type.compareTo("addmatch")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_name				user name
@@ -307,11 +310,11 @@ public class DataHost{
 						String pid = "";
 						Boolean valid = this.dh.validateClient(name,key);
 						Boolean success = false;
-						if(valid){
+						if (valid) {
 							//Next DataValue popped from the stack:
 							//profile_id				profile id
 							pid = recv_msg.pop().getValue();
-							if(pid!=null){
+							if (pid!=null) {
 								String option = new Random().nextInt(100) > 50 ? "left" : "right";
 								//Randomly assigns swipe to left or right for the moment
 								success = dm.addMatch(name,pid,option);
@@ -331,7 +334,7 @@ public class DataHost{
 						out.writeObject(resp_msg);
 						System.out.println("AddMatch :: sending response obj...");
 						
-					}else if(req_type.compareTo("getdistance")==0){
+					} else if (req_type.compareTo("getdistance")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_name				user name
@@ -341,7 +344,7 @@ public class DataHost{
 						Boolean valid = this.dh.validateClient(name,key);
 						Boolean success = false;
 						int distance = -1;
-						if(valid){
+						if (valid) {
 							//Next 2 DataValues are popped from the stack:
 							//origin				origin city
 							//destination			destination city
@@ -369,7 +372,7 @@ public class DataHost{
 						out.writeObject(resp_msg);
 						System.out.println("GetDistance :: sending response obj...");
 						
-					}else if(req_type.compareTo("getprofile")==0){
+					} else if (req_type.compareTo("getprofile")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_name				user name
@@ -381,7 +384,7 @@ public class DataHost{
 						Profile prof = null;
 						
 						//If user is logged in
-						if(valid){
+						if (valid) {
 							//Return user profile as profile object
 							prof = dm.getProfile(name);
 							success = (prof != null);
@@ -402,12 +405,12 @@ public class DataHost{
 						
 						//Additionally, if the request was successful, then send the
 						//profile object directly over the stream
-						if(success){
+						if (success) {
 							out.writeObject(prof);
 							System.out.println("GetProfile :: sending response obj...");
 						}
 						
-					}else if(req_type.compareTo("editprofile")==0){
+					} else if (req_type.compareTo("editprofile")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_name				user name
@@ -419,7 +422,7 @@ public class DataHost{
 						Profile prof = null;
 						
 						//If user is logged in
-						if(valid){
+						if (valid) {
 							//Read profile object directly over input stream
 							prof = (Profile) in.readObject();
 							//Update return value based on success of editProfile method
@@ -440,7 +443,7 @@ public class DataHost{
 						out.writeObject(resp_msg);
 						System.out.println("EditProfile :: sending response obj...");
 						
-					}else if(req_type.compareTo("getmatches")==0){
+					} else if (req_type.compareTo("getmatches")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_name				user name
@@ -452,15 +455,15 @@ public class DataHost{
 						ArrayList<Profile> profiles = null;
 						
 						//If user is logged in
-						if(valid){
+						if (valid) {
 							//Next DataValue popped from the stack:
 							//local				true/false
 							String local = recv_msg.pop().getValue();
 							
 							//If local is set to true, filter matches by distance settings
-							if(local.compareTo("true")==0){
+							if (local.compareTo("true")==0) {
 								profiles = dm.getNearbyMatches(name,this.dh.getNearbyClients(name));
-							}else{
+							} else {
 								profiles = dm.getMatches(name);
 							}
 							success = (profiles != null);
@@ -478,14 +481,14 @@ public class DataHost{
 						
 						//Send the object over the output stream
 						out.writeObject(resp_msg);
-						if(success){
+						if (success) {
 							out.writeObject(profiles);
 							System.out.println("GetMatches :: sending response obj...");
 						}
 						
 						//Print server status
 						this.dh.serverStatus();
-					}else if(req_type.compareTo("heartbeat")==0){
+					} else if (req_type.compareTo("heartbeat")==0) {
 						
 						//Next 2 DataValues are popped from the stack:
 						//user_name				user name
@@ -509,10 +512,10 @@ public class DataHost{
 						System.out.println("Heartbeat :: sending response obj...");
 						
 						//If heartbeat request succeeds, reset timestamp for corresponding user
-						if(success){
+						if (success) {
 							this.dh.resetHeartbeat(name);
 						}
-					}else{
+					} else {
 						System.out.println("Action not recognized...");
 					}
 					
@@ -522,10 +525,11 @@ public class DataHost{
 					
 					this.dh.updateHeartbeats();
 				}
-			}catch(IOException ioe){
+			} catch(IOException ioe) {
+				System.out.println(ioe);
 				
-			}catch(ClassNotFoundException cnfe){
-				
+			} catch(ClassNotFoundException cnfe) {
+				System.out.println(cnfe);
 			}
 		}
 	}
