@@ -5,7 +5,6 @@ public class User{
 	
 	public User(DataRequest dr){
 		this.request_obj = dr;
-		this.profile_obj = this.request_obj.getProfile();
 	}
 	
 	public Profile getProfile(){

@@ -21,6 +21,18 @@ public class ProfileList implements Serializable{
 		return true;
 	}
 
+	public Profile getProfile(){
+		if(this.profiles.size() > 0){
+			return this.profiles.get(this.curr_index);
+		}else{
+			return null;
+		}
+	}	
+
+	public void resetIndex(){
+		this.curr_index = -1;
+	}
+
 	public Profile getProfile(int i){
 		if(this.profiles.size() > 0){
 			return this.profiles.get(i);

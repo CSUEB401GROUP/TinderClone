@@ -42,6 +42,10 @@ public class Profile implements Serializable{
 		return return_list;
 	}
 	
+	public Picture getPicture(){
+		return this.user_pic;
+	}
+	
 	public void print(){
 		System.out.println("Printing profile of... " + this.getAttribute("profile_fname",false));
 	}

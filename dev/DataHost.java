@@ -62,13 +62,17 @@ public class DataHost{
 	//Updates time elapsed since last heartbeat for each user
 	private void updateHeartbeats(){
 		Iterator<String> iterator = this.heartbeats.keySet().iterator();
+		ArrayList<String> expired = new ArrayList<String>();
 		while(iterator.hasNext()){
 			String client = iterator.next();
 			long lastbeat = this.heartbeats.get(client);
 			long elapsed = (System.currentTimeMillis() - lastbeat)/1000;
 			if(elapsed > 30){
-				this.removeClient(client);
+				expired.add(client);
 			}
+		}
+		for(String e : expired){
+			this.removeClient(e);
 		}
 	}
 	

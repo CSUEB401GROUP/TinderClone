@@ -13,10 +13,12 @@ public class MainWindow {
 	private JList list_obj;
 	private MatchSystem match_obj;
 	private RateWindow rate_win;
+	private Authentication auth_obj;
 	
-	public MainWindow(MatchSystem ms){  
+	public MainWindow(Authentication auth, MatchSystem ms){  
 		win=new JFrame();
 		win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		auth_obj = auth;
 		match_obj = ms;	  
 
 		addButtons();
@@ -30,10 +32,11 @@ public class MainWindow {
 
 		JScrollPane dataListScrollPane = new JScrollPane(list_obj);  
 		controlPanel = new JPanel();
-		controlPanel.setLayout(new GridLayout(3,1));
+		controlPanel.setLayout(new GridLayout(4,1));
 		controlPanel.add(btn_nearby);
 		controlPanel.add(btn_history);
 		controlPanel.add(btn_mutual);
+		controlPanel.add(btn_logout);
 		controlPanel.setMaximumSize(new Dimension(100,500));
 		dataListScrollPane.setMaximumSize(new Dimension(500, 100));
 		
@@ -78,25 +81,33 @@ public class MainWindow {
 				showMutualMatches();
 			} 
 		}); 
+		btn_logout=new JButton("Logout");
+		btn_logout.setBounds(130,100,30,20); 
+		btn_logout.addActionListener(new ActionListener(){  
+			@Override
+			public void actionPerformed(ActionEvent e){  
+				logout();
+			} 
+		}); 
 	}
 	
-	public void createMatch(){
-		//
+	public void logout(){
+		this.auth_obj.logout();
+		win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+	}
+	
+	public void createMatch(Profile p,String match_option){
+		this.match_obj.createMatch(p,match_option);
 	}
 
 	public void showNearbyMatches(){
-		this.rate_win.setVisible(true);
 		this.data_list.clear();				
 		ProfileList profiles;
 		profiles = match_obj.getMatches(true);
-		//If there are any profiles in the results, print them
+
 		if(profiles!=null){
-			Profile p = profiles.getNextProfile();
-			
-			while(p != null){
-				addItem(p.getAttribute("profile_fname",false));
-				p = profiles.getNextProfile();
-			}
+			this.rate_win.setProfileList(profiles);
+			this.rate_win.showNextProfile();
 		}
 	}
 
@@ -105,7 +116,7 @@ public class MainWindow {
 		this.data_list.clear();				
 		ProfileList profiles;
 		profiles = match_obj.getMutualMatches();
-		//If there are any profiles in the results, print them
+		
 		if(profiles!=null){
 			Profile p = profiles.getNextProfile();
 			
@@ -121,7 +132,7 @@ public class MainWindow {
 		this.data_list.clear();
 		ProfileList profiles;
 		profiles = match_obj.getMatchHistory();
-		//If there are any profiles in the results, print them
+		
 		if(profiles!=null){
 			Profile p = profiles.getNextProfile();
 			

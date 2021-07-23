@@ -17,7 +17,10 @@ public class SimpleDriver{
 			Authentication auth = new Authentication(dr);
 			User user = new User(dr);
 			MatchSystem ms = new MatchSystem(dr);
-			MainWindow win = new MainWindow(ms);
+			
+			//Instantiate swing class to open window 
+			MainWindow win = new MainWindow(auth,ms);
+			
 			Boolean valid = false;
 			
 			//Call appropriate methods (login or register) from DataRequest object
