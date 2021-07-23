@@ -1,47 +1,49 @@
-package com.tinderclone.common.entity;
-
+import java.io.*;
+import java.util.*;
 import java.io.Serializable;
 
-public class Profile implements Serializable {
+public class Profile implements Serializable{
 	
-	private static final long serialVersionUID = -3796265508510487052L;
-
-	public Profile(String name) {
-		super();
-	}
-
-	private Attribute attribute = new Attribute();
-	private Picture picture;
-	private Location location;
-	private String ID;
+	private HashMap<String,Attribute> attributes;
+	private Picture user_pic;
 	
-	public void displayAll() {
-		System.out.println(this.getAttribute().toString());
-		System.out.println(this.getPicture().toString());
+	public Profile(String fn, String ln, String a, String g){
+		this.attributes = new HashMap<String,Attribute>();
+		this.attributes.put("profile_fname",new Attribute("profile_fname",fn));
+		this.attributes.put("profile_lname",new Attribute("profile_lname",ln));
+		this.attributes.put("profile_age",new Attribute("profile_age",a));
+		this.attributes.put("profile_gender",new Attribute("profile_gender",g));
+		this.user_pic = new Picture("male_small.jpg");
 	}
-	
-	public Attribute getAttribute() {
-		return this.attribute;
-	}
-	
-	public void editAttribute(String name) {
-		this.attribute = new Attribute();
-		this.attribute.setName(name);
-	}
-
-	public String getID() {
-		return ID;
-	}
-
-	public void setID(String iD) {
-		this.ID = iD;
-	}
-
-	public Picture getPicture() {
-		return picture;
+	public String getAttribute(String name, Boolean pref){
+		if(pref){
+			return this.attributes.get(name).getPrefValue();
+		}else{
+			return this.attributes.get(name).getUserValue();
+		}
+	}	
+	public void editAttribute(String name,String value,Boolean pref){
+		if(pref){
+			Attribute a = this.attributes.get(name);
+			a.setPrefValue(value);
+		}else{
+			Attribute a = this.attributes.get(name);
+			a.setUserValue(value);
+		}
 	}
 	
-	public Location getLocation() {
-		return this.location;
+	public HashMap<String,String> getAllAttributes(Boolean pref){
+		HashMap<String,String> return_list = new HashMap<String,String>();
+		if(pref){
+			this.attributes.forEach((String name,Attribute attr) -> return_list.put(name,attr.getPrefValue()));
+		}else{
+			this.attributes.forEach((String name,Attribute attr) -> return_list.put(name,attr.getUserValue()));
+		}
+		return return_list;
 	}
+	
+	public void print(){
+		System.out.println("Printing profile of... " + this.getAttribute("profile_fname",false));
+	}
+	
 }

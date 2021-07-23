@@ -1,11 +1,13 @@
-package com.tinderclone.common.entity;
-
-public class Location {
-
-	private String city;
-	private int distance;
+public class Location{
 	
-	public Integer getDistance(String city1, String city2) {
-		return 0;
+	DataRequest request_obj;
+	
+	public Location(DataRequest dr){
+		this.request_obj = dr;
 	}
+	
+	public int getDistance(String city1, String city2){
+		return this.request_obj.getDistance(city1,city2);
+	}
+	
 }

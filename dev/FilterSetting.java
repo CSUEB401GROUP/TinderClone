@@ -1,16 +1,32 @@
-package com.tinderclone.common.entity;
+import java.util.*;
 
 public class FilterSetting {
-
-	public String getName() {
-		return null;
+	
+	String name;
+	String value;
+	
+	public FilterSetting(String n, String v){
+		this.name = n;
+		this.value = v;
 	}
 	
-	public String getValue() {
-		return null;
+	public String getName(){
+		return this.name;
 	}
 	
-	public boolean compare(Attribute attribute) {
-		return true;
+	public void setName(String n){
+		this.name = n;
+	}
+	
+	public String getValue(){
+		return this.value;
+	}
+	
+	public void setValue(String v){
+		this.value = v;
+	}	
+	
+	public Boolean compare(String attr){
+		return this.getValue().compareTo(attr)==0;
 	}
 }

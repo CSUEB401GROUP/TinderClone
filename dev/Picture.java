@@ -1,9 +1,19 @@
-package com.tinderclone.common.entity;
+import java.io.Serializable;
 
-public class Picture {
+public class Picture implements Serializable {
 
-	private String path;
+	String path;
 
-	public String getPath() { return path; }
-	public void setPath(String path) { this.path = path; }
+	public Picture(String p){
+		this.path = p;
+	}
+	
+	public String getPath(){
+		return this.path;
+	}
+	
+	public void setPath(String p){
+		this.path = p;
+	}
+
 }

@@ -1,33 +1,23 @@
-package com.tinderclone.common.entity;
-
 import java.io.Serializable;
 
-public class DataValue implements Serializable {
-
-	private static final long serialVersionUID = -1195639008049531271L;
-	
+public class DataValue implements Serializable{
 	private String name;
 	private String value;
-
-	public DataValue(String n, String v) {
+	
+	public DataValue(String n, String v){
 		this.name = n;
 		this.value = v;
 	}
-
-	public String getName() {
-		return name;
+	public void setName(String n){
+		this.name = n;
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	public String getName(){
+		return this.name;
 	}
-
-	public String getValue() {
-		return value;
+	public void setValue(String v){
+		this.value = v;
 	}
-
-	public void setValue(String value) {
-		this.value = value;
+	public String getValue(){
+		return this.value;
 	}
-
 }

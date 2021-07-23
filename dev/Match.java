@@ -1,18 +1,13 @@
-package com.tinderclone.common.entity;
 
-import java.util.Date;
 
-public class Match {
-
-	public Profile getProfile() {
-		return null;
-	}
+public class Match{
 	
-	public Date getMatchDate() {
-		return null;
-	}
+	Profile profile;
 	
-	public String getUserID() {
-		return null;
+	public Match(Profile p){
+		this.profile = p;
+	}
+	public Profile getProfile(){
+		return this.profile;
 	}
 }
