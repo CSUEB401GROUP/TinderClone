@@ -10,4 +10,7 @@ public class Location{
 		return this.request_obj.getDistance(city1,city2);
 	}
 	
+	public int getDistance(Profile p){
+		return this.request_obj.getDistance(p);
+	}	
 }

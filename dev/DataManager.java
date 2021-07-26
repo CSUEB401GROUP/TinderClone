@@ -63,10 +63,10 @@ public class DataManager{
 		params.put("profile_lname","");
 		params.put("profile_gender","male");
 		params.put("profile_age",Integer.toString(pid*3));
-		params.put("profile_pref_distance",Integer.toString(new Random().nextInt(750)));
+		params.put("profile_distance",Integer.toString(new Random().nextInt(750)));
 		
 		//Specify header fields in an array for the addEntry method
-		String[] headers = {"profile_id","profile_uid","profile_fname","profile_lname","profile_age","profile_gender","profile_pref_distance"};
+		String[] headers = {"profile_id","profile_uid","profile_fname","profile_lname","profile_age","profile_gender","profile_distance"};
 		valid = this.profileDB.addEntry(params,headers);	
 		return valid;
 	}
@@ -170,7 +170,7 @@ public class DataManager{
 		//If profile exists, store in return object
 		if(found){
 			DataEntry de = this.profileDB.getDataEntryList(params).currentEntry();
-			prof = new Profile(de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender"));
+			prof = new Profile(de.getByField("profile_uid"),de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender"),de.getByField("profile_distance"),de.getByField("profile_pref_age"),de.getByField("profile_pref_gender"));
 		}
 		return prof;
 	}
@@ -180,15 +180,35 @@ public class DataManager{
 		Boolean success = false;
 		HashMap<String,String> pref_values = prof.getAllAttributes(true);
 		HashMap<String,String> user_values = prof.getAllAttributes(false);
+		
+		ArrayList<String> keys = new ArrayList<String>();
+		
+		keys.add("profile_fname");
+		keys.add("profile_lname");
+		keys.add("profile_age");
+		keys.add("profile_gender");
+		keys.add("profile_distance");
+		keys.add("profile_pref_age");
+		keys.add("profile_pref_gender");
+		
 		HashMap<String,String> all_values = new HashMap<String,String>();
 		
 		pref_values.forEach((String n,String v) -> all_values.put(n,v));
 		user_values.forEach((String n,String v) -> all_values.put(n,v));
 		
+		all_values.put("profile_distance",pref_values.get("profile_pref_distance"));
+		HashMap<String,String> submit_values = new HashMap<String,String>();
+		
+		for(String k : keys){
+			submit_values.put(k,all_values.get(k));
+		}
+		
+		submit_values.forEach((String n, String v) -> System.out.println(n + " : " + v + " ---------------------------"));
+		
 		//Get the user_id via the user_name
 		String uid = this.getUserID(name);
 
-		success = this.profileDB.setDataEntry("profile_uid",uid,all_values);
+		success = this.profileDB.setDataEntry("profile_uid",uid,submit_values);
 
 		return success;
 	}
@@ -221,7 +241,7 @@ public class DataManager{
 		}		
 		
 		//Test parameter to retrieve only female profiles
-		params.put("profile_gender","female");
+		//params.put("profile_gender","female");
 		results = this.profileDB.getDataEntryList(params);
 		params.clear();
 		
@@ -230,7 +250,7 @@ public class DataManager{
 			profiles = new ArrayList<Profile>();
 			while(de != null){
 				if(!matched.contains(de.getByField("profile_uid"))){
-					profiles.add(new Profile(de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender")));
+					profiles.add(new Profile(de.getByField("profile_uid"),de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender"),de.getByField("profile_distance"),de.getByField("profile_pref_age"),de.getByField("profile_pref_gender")));
 				}
 				de = results.getNextEntry();
 			}
@@ -273,7 +293,7 @@ public class DataManager{
 			profiles = new ArrayList<Profile>();
 			while(de != null){
 				if(matched.contains(de.getByField("profile_uid"))){
-					profiles.add(new Profile(de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender")));
+					profiles.add(new Profile(de.getByField("profile_uid"),de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender"),de.getByField("profile_distance"),de.getByField("profile_pref_age"),de.getByField("profile_pref_gender")));
 				}
 				de = results.getNextEntry();
 			}
@@ -330,7 +350,7 @@ public class DataManager{
 			profiles = new ArrayList<Profile>();
 			while(de != null){
 				if(mutual.contains(de.getByField("profile_uid")) && de.getByField("profile_uid").compareTo(uid)!=0){
-					profiles.add(new Profile(de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender")));
+					profiles.add(new Profile(de.getByField("profile_uid"),de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender"),de.getByField("profile_distance"),de.getByField("profile_pref_age"),de.getByField("profile_pref_gender")));
 				}
 				de = results.getNextEntry();
 			}
@@ -380,7 +400,7 @@ public class DataManager{
 					Boolean found = this.profileDB.entryExists(params);
 					DataEntry de = this.profileDB.getDataEntryList(params).currentEntry();
 					if(found!=null){
-						profiles.add(new Profile(de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender")));
+						profiles.add(new Profile(de.getByField("profile_uid"),de.getByField("profile_fname"),de.getByField("profile_lname"),de.getByField("profile_age"),de.getByField("profile_gender"),de.getByField("profile_distance"),de.getByField("profile_pref_age"),de.getByField("profile_pref_gender")));
 					}
 				}
 			}
@@ -401,6 +421,18 @@ public class DataManager{
 		return uid;
 	}
 	
+	//Retrieves user_id from userDB for a given user_name
+	public String getUserName(String id){
+		//Create a parameter hashmap with key -> value pairs
+		HashMap<String,String> params = new HashMap<String,String>();
+		
+		params.put("user_id",id);
+		String uname = this.userDB.getDataEntryList(params).currentEntry().getByField("user_name");
+		params.clear();
+		
+		return uname;
+	}
+	
 	//Returns maximum specified search range for a given user
 	public int getRange(String name){
 		//Create a parameter hashmap with key -> value pairs
@@ -411,7 +443,7 @@ public class DataManager{
 		params.put("profile_uid",uid);
 		DataEntryList results = this.profileDB.getDataEntryList(params);
 		if(results!=null){
-			return Integer.parseInt(results.currentEntry().getByField("profile_pref_distance"));
+			return Integer.parseInt(results.currentEntry().getByField("profile_distance"));
 		}
 		return -1;
 	}

@@ -31,6 +31,10 @@ public class MatchSystem{
 	public ProfileList filterProfiles(ProfileList plist){
 		return this.filter_obj.filterProfiles(plist);
 	}
+
+	public int getDistance(Profile p){
+		return this.location_obj.getDistance(p);
+	}
 	
 	public int getDistance(String city1, String city2){
 		return this.location_obj.getDistance(city1,city2);
@@ -40,5 +44,12 @@ public class MatchSystem{
 		this.filter_obj.editFilterSetting(name,value);
 	}
 	
+	public void clearFilters(){
+		this.filter_obj.clearAllFilters();
+	}
+	
+	public Profile getUserProfile(){
+		return this.request_obj.getProfile();
+	}
 	
 }

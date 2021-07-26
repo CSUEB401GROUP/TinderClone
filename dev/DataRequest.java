@@ -192,61 +192,22 @@ public class DataRequest implements Serializable{
 	}
 	
 	public Boolean logout(){
-		try{
-			//Create Stack<DataValue> request object and add parameters as DataValue objects
-			Stack<DataValue> req_msg = new Stack<DataValue>();
-			req_msg.push(new DataValue("session_key",this.session_key));
-			req_msg.push(new DataValue("user_name",this.user_name));
-			req_msg.push(new DataValue("request_type","logout"));
-			
-			//Send stack object over stream to host
-			request.writeObject(req_msg);
-			
-			System.out.println("Logout sent :: Awaiting response object...");
-				
-			//Read in Stack<DataValue> object and pop parameters off into local variables
-			//response_value	valid or error
-			//response_type		same as request type	
-			Stack<DataValue> recv_msg = (Stack<DataValue>) response.readObject();
-			String resp_type = recv_msg.pop().getValue();
-			String resp_value = recv_msg.pop().getValue();
-			
-			System.out.println("Response type: " + resp_type);
-			System.out.println("Response value: " + resp_value);
-			
-			if(resp_value.compareTo("valid")==0){
-				this.active = false;
-			}
-
-			return true;
-		}catch(IOException ioe){
-			
-		}catch(ClassNotFoundException cnfe){
-			
-		}
-		return false;
-	}
-	
-	public Boolean heartbeat(){
-		try{
-			//Ensures a minimum 2 second delay between heartbeats
-			//to avoid a spammed stream of requests
-			if((System.currentTimeMillis() - this.lastbeat)/1000 > 2){
-				
+		if(this.active){
+			try{
 				//Create Stack<DataValue> request object and add parameters as DataValue objects
 				Stack<DataValue> req_msg = new Stack<DataValue>();
 				req_msg.push(new DataValue("session_key",this.session_key));
 				req_msg.push(new DataValue("user_name",this.user_name));
-				req_msg.push(new DataValue("request_type","heartbeat"));
+				req_msg.push(new DataValue("request_type","logout"));
 				
 				//Send stack object over stream to host
 				request.writeObject(req_msg);
 				
-				System.out.println("Heartbeat sent :: Awaiting response object...");
+				System.out.println("Logout sent :: Awaiting response object...");
 					
 				//Read in Stack<DataValue> object and pop parameters off into local variables
 				//response_value	valid or error
-				//response_type		same as request type		
+				//response_type		same as request type	
 				Stack<DataValue> recv_msg = (Stack<DataValue>) response.readObject();
 				String resp_type = recv_msg.pop().getValue();
 				String resp_value = recv_msg.pop().getValue();
@@ -254,9 +215,52 @@ public class DataRequest implements Serializable{
 				System.out.println("Response type: " + resp_type);
 				System.out.println("Response value: " + resp_value);
 				
-				//Update last heartbeat timestamp
-				this.lastbeat = System.currentTimeMillis();
+				if(resp_value.compareTo("valid")==0){
+					this.active = false;
+				}
+
 				return true;
+			}catch(IOException ioe){
+				
+			}catch(ClassNotFoundException cnfe){
+				
+			}
+		}
+		return false;
+	}
+	
+	public Boolean heartbeat(){
+		try{
+			if(this.isActive()){
+				//Ensures a minimum 2 second delay between heartbeats
+				//to avoid a spammed stream of requests
+				if((System.currentTimeMillis() - this.lastbeat)/1000 > 2){
+					
+					//Create Stack<DataValue> request object and add parameters as DataValue objects
+					Stack<DataValue> req_msg = new Stack<DataValue>();
+					req_msg.push(new DataValue("session_key",this.session_key));
+					req_msg.push(new DataValue("user_name",this.user_name));
+					req_msg.push(new DataValue("request_type","heartbeat"));
+					
+					//Send stack object over stream to host
+					request.writeObject(req_msg);
+					
+					System.out.println("Heartbeat sent :: Awaiting response object...");
+						
+					//Read in Stack<DataValue> object and pop parameters off into local variables
+					//response_value	valid or error
+					//response_type		same as request type		
+					Stack<DataValue> recv_msg = (Stack<DataValue>) response.readObject();
+					String resp_type = recv_msg.pop().getValue();
+					String resp_value = recv_msg.pop().getValue();
+					
+					System.out.println("Response type: " + resp_type);
+					System.out.println("Response value: " + resp_value);
+					
+					//Update last heartbeat timestamp
+					this.lastbeat = System.currentTimeMillis();
+					return true;
+				}
 			}
 			return false;
 		}catch(IOException ioe){
@@ -308,6 +312,7 @@ public class DataRequest implements Serializable{
 			Stack<DataValue> req_msg = new Stack<DataValue>();
 			req_msg.push(new DataValue("destination",destination));
 			req_msg.push(new DataValue("origin",origin));
+			req_msg.push(new DataValue("by_city","true"));
 			req_msg.push(new DataValue("session_key",this.session_key));
 			req_msg.push(new DataValue("user_name",this.user_name));
 			req_msg.push(new DataValue("request_type","getdistance"));
@@ -337,6 +342,44 @@ public class DataRequest implements Serializable{
 		}
 		return -1;
 	}
+	
+	public int getDistance(Profile p){
+		try{
+			int distance = -1;
+			//Create Stack<DataValue> request object and add parameters as DataValue objects
+			Stack<DataValue> req_msg = new Stack<DataValue>();
+			req_msg.push(new DataValue("uid2",p.getUID()));
+			req_msg.push(new DataValue("uid1",this.user_name));
+			req_msg.push(new DataValue("by_city","false"));
+			req_msg.push(new DataValue("session_key",this.session_key));
+			req_msg.push(new DataValue("user_name",this.user_name));
+			req_msg.push(new DataValue("request_type","getdistance"));
+			
+			//Send stack object over stream to host
+			request.writeObject(req_msg);
+			
+			System.out.println("GetDistance sent :: Awaiting response object...");
+				
+			//Read in Stack<DataValue> object and pop parameters off into local variables
+			//distance			distance returned
+			//response_value	valid or error
+			//response_type		same as request type			
+			Stack<DataValue> recv_msg = (Stack<DataValue>) response.readObject();
+			String resp_type = recv_msg.pop().getValue();
+			String resp_value = recv_msg.pop().getValue();
+			distance = Integer.parseInt(recv_msg.pop().getValue());
+			
+			System.out.println("Response type: " + resp_type);
+			System.out.println("Response value: " + resp_value);
+		
+			return distance;
+		}catch(IOException ioe){
+			
+		}catch(ClassNotFoundException cnfe){
+			
+		}
+		return -1;
+	}	
 	
 	public Profile getProfile(){
 		try{

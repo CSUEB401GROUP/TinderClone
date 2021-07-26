@@ -345,7 +345,6 @@ public class DataHost{
 						
 						if(valid){
 							Profile prof = (Profile) in.readObject();
-							System.out.println("validated as valid ++++++++++++++++++++++++++++++");
 							success = dm.addMatch(name,prof,option);
 						}
 						String response = (success) ? "valid" : "error";
@@ -373,12 +372,30 @@ public class DataHost{
 						Boolean success = false;
 						int distance = -1;
 						if(valid){
-							//Next 2 DataValues are popped from the stack:
-							//origin				origin city
-							//destination			destination city
-							String origin = recv_msg.pop().getValue();
-							String destination = recv_msg.pop().getValue();
+							//Next DataValue determines whether request params
+							//are 2 cities or 2 user ids
+							String by_city = recv_msg.pop().getValue();
 							
+							String origin;
+							String destination;
+							
+							if(by_city.compareTo("true")==0){
+								//Next 2 DataValues are popped from the stack:
+								//origin				origin city
+								//destination			destination city
+								origin = recv_msg.pop().getValue();
+								destination = recv_msg.pop().getValue();
+							}else{
+								//Next DataValues are popped from the stack:
+								//origin				origin city
+								//destination			destination city
+								String uname1 = recv_msg.pop().getValue();
+								String uid2 = recv_msg.pop().getValue();
+								String uname2 = dm.getUserName(uid2);
+								
+								origin = this.dh.locations.get(uname1);
+								destination = this.dh.locations.get(uname2);
+							}
 							//Retrieve distance between input cities
 							distance = dm.getDistance(origin,destination);
 							
@@ -416,6 +433,9 @@ public class DataHost{
 							//Return user profile as profile object
 							prof = dm.getProfile(name);
 							success = (prof != null);
+							if(success){
+								prof.setCity(this.dh.locations.get(name));
+							}
 						}
 						
 						String response = (success) ? "valid" : "error";
@@ -453,6 +473,8 @@ public class DataHost{
 						if(valid){
 							//Read profile object directly over input stream
 							prof = (Profile) in.readObject();
+							
+							//System.out.println(prof.getAttribute("profile_fname"));
 							//Update return value based on success of editProfile method
 							success = dm.editProfile(name,prof);
 						}
@@ -491,6 +513,9 @@ public class DataHost{
 							//If local is set to true, filter matches by distance settings
 							if(local.compareTo("true")==0){
 								profiles = dm.getNearbyMatches(name,this.dh.getNearbyClients(name));
+								for(Profile p : profiles){
+									p.setCity(this.dh.locations.get(dm.getUserName(p.getUID())));
+								}
 							}else{
 								profiles = dm.getMatches(name);
 							}

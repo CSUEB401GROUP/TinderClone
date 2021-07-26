@@ -6,10 +6,10 @@ public class Attribute implements Serializable {
 	String user_value;
 	String pref_value;
 	
-	public Attribute(String n, String uv){
+	public Attribute(String n, String uv, String pv){
 		this.name = n;
 		this.user_value = uv;
-		this.pref_value = uv;
+		this.pref_value = pv;
 	}
 	
 	public String getName(){

@@ -25,7 +25,8 @@ public class Filter{
 			ArrayList<FilterSetting> fsets = new ArrayList<FilterSetting>();
 			this.settings.forEach((String name,FilterSetting fs) -> fsets.add(fs));
 			for(FilterSetting f : fsets){
-				if(f.compare(p.getAttribute(f.getName(),true))==false){
+				System.out.println(f.getName() + " = " + f.getValue() + " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+				if(f.compare(p.getAttribute(f.getName(),false))==false){
 					valid = false;
 				}
 			}
@@ -36,6 +37,10 @@ public class Filter{
 			p = input_list.getNextProfile();
 		}
 		return return_list;
+	}
+	
+	public void clearAllFilters(){
+		this.settings.clear();
 	}
 	
 }
